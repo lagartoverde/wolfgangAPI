@@ -73,6 +73,12 @@ app.post('/cwlSignup', (req,res) => {
     })
 })
 
+app.get('/cwl', (req,res) => {
+  CWLSignup.find({}, (err, players) => {
+    res.send(players)
+  })
+})
+
 app.post('/', (req,res) => {
   res.send(req.body.username)
 })
