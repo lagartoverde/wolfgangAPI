@@ -4,6 +4,10 @@ const fetch = require("node-fetch");
 const app = express()
 const port = 3000
 
+const CWLSignup = require('./Models/CWLSignup')
+
+require('./mongoConnection')
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -37,6 +41,34 @@ app.get('/wolfgang', (req, res) =>{
         donationsReceived: member.donationsReceived
       }))
       res.send(membersFormatted);
+    
+    })
+})
+
+app.post('/cwlSignup', (req,res) => {
+  const tag = encodeURIComponent(req.body.tag);
+
+  console.log(req.body.tag)
+
+  fetch('https://api.clashofclans.com/v1/players/' + tag, {
+    method: 'GET',
+    headers: {
+      'Authorization' : 'Bearer ' + apiKey,
+    }
+  }).then((response) => response.json())
+    .then((json) => {
+      //here you get the json in the json variable and you can do whatever you want with it
+      // we will get the members and for each member get only some params
+      const player = {
+        tag: json.tag,
+        playerName: json.name,
+        thLevel: json.townHallLevel,
+        clan: json.clan.name
+      }
+      
+      const newCWLSignup = new CWLSignup(player)
+
+      newCWLSignup.save().then(()=> res.send('Registro realizado correctamente'))
     
     })
 })
